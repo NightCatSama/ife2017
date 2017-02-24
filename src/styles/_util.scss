@@ -1,0 +1,56 @@
+/*
+ * Beautiful Color
+ */
+$pink: #f7acbc;
+$roseate: #f05b72;
+$light-red: #d93a49;
+$red: #d71345;
+$dark-red: #b22c46;
+$orange: #f47920;
+$yellow: #ffd400;
+$dark-yellow: #ffc20e;
+$purple: #9b59b6;
+$light-blue: #77d5d4;
+$blue: #3498db;
+$dark-blue: #2980b9;
+$green: #2ecc71;
+$light-green: #52be7f;
+$dark-green: #27ae60;
+$brown: #843900;
+$sliver: #8492A6;
+$light-sliver: #99A9BF;
+$light-black: #324057;
+$black: #130c0e;
+$white: #fffffb;
+$light-gray: #E5E9F2;
+$gray: #D3DCE6;
+$masstone: #798f9a;
+$tr: transparent;
+$colors: ($red: #E74C3C, $blue: #3498DB, $yellow: #F1C40F, $green: #2ECC71, $orange: #E67E22, $purple: #9B59B6);
+
+/*
+ * 设置placeholder样式
+ */
+@mixin placeholder($color: #CCC, $font-size: inherit){
+    &::-moz-placeholder {
+        color: $color;
+        font-size: $font-size;
+    }
+    &:-ms-input-placeholder {
+        color: $color;
+        font-size: $font-size;
+    }
+    &::-webkit-input-placeholder {
+        color: $color;
+        font-size: $font-size;
+    }
+}
+
+/*
+ * flex 居中
+ */
+@mixin flex-center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
