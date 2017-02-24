@@ -13,9 +13,9 @@ body {
 .container {
 	position: relative;
 	display: block;
-	max-width: 500px;
+	max-width: 800px;
 	display: flex;
-	width: 40%;
+	width: 60%;
 
 	img {
 		width: 100%;
@@ -41,6 +41,7 @@ body {
 			flex-direction: column;
 			opacity: 0;
 			text-shadow: 1px 1px 2px rgba(0, 0, 0, .26);
+			box-shadow: 0 0 30px 20px rgba(0, 0, 0, 0.46);
 			transition: opacity $animation_time;
 
 			&::before {
@@ -105,7 +106,7 @@ body {
         animation: breathe 5s infinite linear;
 	}
 
-	&:hover, &.hover {
+	&:hover {
 		img {
 			filter: blur(1px);
 		}
