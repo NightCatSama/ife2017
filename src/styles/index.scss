@@ -2,18 +2,27 @@
 @import './reset';
 
 body {
-	background-color: $blue;
-	width: 100vw;
-	height: 100vh;
-	@include flex-center;
+	display: flex;
+	flex-wrap: wrap;
+	width: 100%;
 }
 
-h1 {
-	color: $white;
-	@extend .size;
-	font-family: "Segoe UI";
-}
+.card {
+	display: flex;
+	width: 33%;
+	flex-direction: column;
+	align-items: center;
+	padding: 30px;
+	margin: 20px;
+	color: $light-black;
+	box-shadow: 0 0 3px 2px rgba(0, 0, 0, .36);
 
-.size {
-	font-size: 50px;
+	.img {
+		width: 80%;
+		margin-bottom: 20px;
+	}
+
+	a {
+		color: $light-black;
+	}
 }

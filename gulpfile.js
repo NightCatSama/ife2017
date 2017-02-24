@@ -104,6 +104,7 @@ gulp.task('scripts', function() {
             })
         }))
         .pipe(gulpif(!isDeploy, sourcemaps.init()))
+        .pipe(babel())
         .pipe(uglify())
         .pipe(gulpif(!isDeploy, sourcemaps.write()))
         .pipe(gulp.dest('dist/javascripts'))
