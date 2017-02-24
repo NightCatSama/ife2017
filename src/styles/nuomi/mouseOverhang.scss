@@ -40,8 +40,8 @@ body {
 			@include flex-center;
 			flex-direction: column;
 			opacity: 0;
-			text-shadow: 0 0 10px rgba(255, 255, 255, .36);
-			transition: all $animation_time;
+			text-shadow: 1px 1px 2px rgba(0, 0, 0, .26);
+			transition: opacity $animation_time;
 
 			&::before {
 				content: '';
@@ -84,6 +84,15 @@ body {
 		}
 	}
 
+	/*  流光效果  */
+	.streamer {
+		background-image: -webkit-linear-gradient(left, $blue, $orange 10%, $red 20%, $pink 30%, $yellow 40%, $blue 50%, $orange 60%, $red 70%, $pink 80%, $yellow 90%, $blue);
+		color: $tr;
+		-webkit-background-clip: text;
+		background-size: 200%;
+		animation: streamer 5s infinite linear;
+	}
+
 	/*  滑动出现  */
 	.slideIn {
 		opacity: 0;
@@ -96,14 +105,13 @@ body {
         animation: breathe 5s infinite linear;
 	}
 
-	&:hover {
+	&:hover, &.hover {
 		img {
-			filter: blur(1.5px);
+			filter: blur(1px);
 		}
 
 		.title {
 			opacity: 1;
-			transform: translate(0);
 
 			&::before {
 				height: 100%;
@@ -115,15 +123,6 @@ body {
 				visibility: visible;
 				left: 0;
 			}
-		}
-
-		/*  流光效果  */
-		.streamer {
-			background-image: -webkit-linear-gradient(left, $blue, $orange 10%, $red 20%, $pink 30%, $yellow 40%, $blue 50%, $orange 60%, $red 70%, $pink 80%, $yellow 90%, $blue);
-	        -webkit-text-fill-color: transparent;
-	        -webkit-background-clip: text;
-	        background-size: 200% 100%;
-	        animation: streamer 5s infinite linear;
 		}
 
 		.slideIn {
