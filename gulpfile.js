@@ -37,7 +37,7 @@ gulp.task('browser-sync', ['sass', 'scripts', 'images'], function() {
 // 监听文件变化
 function watch() {
     gulp.watch('src/styles/**/*.scss', ['sass']);
-    gulp.watch('src/javascripts/**/*.js', ['scripts']);
+    gulp.watch('src/**/*.js', ['scripts']);
     gulp.watch(['src/images/**/*.png', 'src/images/**/*.jpg', 'src/images/**/*.jpeg'], ['images']);
     gulp.watch(['index.html', 'views/*.html']).on('change', reload);
     gulp.watch('dist/javascripts/**/*.js').on('change', reload);
@@ -82,7 +82,7 @@ gulp.task('sass', function() {
 
 // Scripts任务
 gulp.task('scripts', function() {
-    return gulp.src('src/javascripts/**/*.js')
+    return gulp.src('src/**/*.js')
         .pipe(plumber({
             errorHandler: function(error) {
                 this.emit('end');
@@ -107,7 +107,7 @@ gulp.task('scripts', function() {
         .pipe(babel())
         .pipe(uglify())
         .pipe(gulpif(!isDeploy, sourcemaps.write()))
-        .pipe(gulp.dest('dist/javascripts'))
+        .pipe(gulp.dest('dist'))
 });
 
 // 图片压缩
