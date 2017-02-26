@@ -15,7 +15,13 @@
 	<title>nightcat-vue</title>
 </head>
 <body>
-	<div id="app"></div>
+	<div id="app">
+		<h1>
+			Hello, {{ name.firstName }} {{ name.lastName }}
+			<br />
+			<small>你点击了：{{ count }}次</small>
+		</h1>
+	</div>
 	<button onclick="addCount()">点击</button>
 	<script src="../dist/vue/dep.js"></script>
 	<script src="../dist/vue/observer.js"></script>
@@ -26,46 +32,26 @@
 	console.log('定义了全局的Cat，可在控制台中测试。使用方法：')
 	console.log(`
 		let app = new Cat({
-		template: \`
-			<div class="container">
-				<h1>
-					Hello, {{ info.name }}
-					<br />
-					<small>你点击了：{{ count }}次</small>
-				</h1>
-			</div>
-		\`,
-		el: document.getElementById('app'),
-		data: {
-			count: 0,
-			info: {
-				name: 'Nightcat',
-				time: []
+			//  template 省略则取 html 中的模板
+			template: '<h1>{{ name }}</h1>'
+			el: document.getElementById('app'),
+			data: {
+				count: 0,
+				name: {
+					firstName: 'Night',
+					lastName: 'Cat'
+				},
+			},
+			watch: {
+				count: function(v) {
+					console.log('初始化监听的count变化：' + v)
+				}
 			}
-		},
-		watch: {
-			count: function(v) {
-				console.log('初始化监听的count变化：' + v)
-			}
-		}
-	})
-	
-	app.$watch('count', function(v) {
-		console.log('之后监听的count变化：' + v)
-	})
+		})
 	`)
 	console.log('======================================')
 
 	let app = new Cat({
-		template: `
-			<div class="container">
-				<h1>
-					Hello, {{ name.firstName }} {{ name.lastName }}
-					<br />
-					<small>你点击了：{{ count }}次</small>
-				</h1>
-			</div>
-		`,
 		el: document.getElementById('app'),
 		data: {
 			count: 0,
@@ -88,10 +74,6 @@
 	app.$watch('name', function (newName) {
 		console.log('我的姓名发生了变化，可能是姓氏变了，也可能是名字变了。')
 	})
-
-	app.$data.name.firstName = 'hahaha'
-	//  目前仍需要手动重载
-	app.__render()
 
 	function addCount () {
 		app.$data.count++

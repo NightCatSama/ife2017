@@ -11,8 +11,8 @@ export default class Cat {
 		watch = {},
 		methods = {}
 	}) {
-		this.$template = template
 		this.$el = el
+		this.$template = template || this.$el.innerHTML
 		this.$watcher = this.__initWatcher(watch)
 		this.$data = new Observer(data, this.$watcher)
 		this.__render()
