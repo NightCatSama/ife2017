@@ -15,8 +15,86 @@
 	<title>nightcat-vue</title>
 </head>
 <body>
-	<h1>请看控制台</h1>
+	<div id="app"></div>
+	<button onclick="changeInfo()">改变info</button>
+	<script src="../dist/vue/dep.js"></script>
 	<script src="../dist/vue/observer.js"></script>
-	<script src="../dist/vue/index.js"></script>
+	<script src="../dist/vue/cat.js"></script>
+	<script>
+	window.Cat = Cat.default
+	console.log('======================================')
+	console.log('定义了全局的Cat，可在控制台中测试。使用方法：')
+	console.log(`
+		let app = new Cat({
+		template: \`
+			<div class="container">
+				<h1>
+					Hello, {{ info.name }}
+					<br />
+					<small>你点击了：{{ count }}次</small>
+				</h1>
+			</div>
+		\`,
+		el: document.getElementById('app'),
+		data: {
+			count: 0,
+			info: {
+				name: 'Nightcat',
+				time: []
+			}
+		},
+		watch: {
+			count: function(v) {
+				this.$data.info.time.push(Date.now())
+				console.log('初始化监听的count变化：' + v)
+			}
+		}
+	})
+	
+	app.$watch('count', function(v) {
+		this.$data.info.time.push(Date.now())
+		console.log('之后监听的count变化：' + v)
+	})
+	`)
+	console.log('======================================')
+
+	let app = new Cat({
+		template: `
+			<div class="container">
+				<h1>
+					Hello, {{ info.name }}
+					<br />
+					<small>你点击了：{{ count }}次</small>
+				</h1>
+			</div>
+		`,
+		el: document.getElementById('app'),
+		data: {
+			count: 0,
+			info: {
+				name: 'Nightcat',
+				time: []
+			}
+		},
+		watch: {
+			count: function(v) {
+				this.$data.info.time.push(Date.now())
+				console.log('初始化监听的count变化：' + v)
+			}
+		}
+	})
+	
+	app.$watch('count', function(v) {
+		this.$data.info.time.push(Date.now())
+		console.log('之后监听的count变化：' + v)
+	})
+
+	function changeInfo () {
+		app.$data.count++
+		//  目前仍需要手动重载
+		app.__render()
+	}
+
+	</script>
 </body>
 </html>

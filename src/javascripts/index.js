@@ -1,7 +1,7 @@
 function createCard(obj) {
 	return `
 <div class="card">
-	<img class="img" src="${obj.img}" alt="" />
+	<div class="img" style="background-image: url(${obj.img})"></div>
 	<p>
 		题目：
 		<a href="${obj.topic_site}" class="topic">${obj.name}</a>

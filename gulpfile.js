@@ -40,8 +40,8 @@ function watch() {
     gulp.watch('src/**/*.js', ['scripts']);
     gulp.watch(['src/images/**/*.png', 'src/images/**/*.jpg', 'src/images/**/*.jpeg'], ['images']);
     gulp.watch(['index.html', 'views/*.html']).on('change', reload);
-    gulp.watch('dist/javascripts/**/*.js').on('change', reload);
-    gulp.watch('dist/stylesheets/**/*.css').on('change', reload);
+    // gulp.watch('dist/javascripts/**/*.js').on('change', reload);
+    // gulp.watch('dist/stylesheets/**/*.css').on('change', reload);
 }
 // 样式处理
 gulp.task('sass', function() {
@@ -108,6 +108,9 @@ gulp.task('scripts', function() {
         .pipe(uglify())
         .pipe(gulpif(!isDeploy, sourcemaps.write()))
         .pipe(gulp.dest('dist'))
+        .pipe(gulpif(!isDeploy, reload({
+            stream: true
+        })))
 });
 
 // 图片压缩
