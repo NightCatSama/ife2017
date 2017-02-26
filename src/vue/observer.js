@@ -25,12 +25,16 @@ class ArrayProxy extends Array {
 	}
 }
 
+var set = {}
+var observeTarget = null
+
 /**
  * Observer
  */
 export default class Observer {
-	constructor (data, watcher) {
-		this.watcher = watcher
+	constructor (data, watcher, root) {
+		this.__watcher__ = watcher
+		this.__root__ = root
 		this.walk(data)
 	}
 	walk (obj) {
@@ -43,7 +47,7 @@ export default class Observer {
 					val = new ArrayProxy(...val)
 				}
 				else if (typeof val === 'object') {
-					val = new Observer(val)
+					val = new Observer(val, this.__watcher__, key)
 				}
 
 				this.convert(key, val)
@@ -55,15 +59,18 @@ export default class Observer {
 			enumerable: true,
 			configurable: true,
 			get: function reactiveGetter() {
+				// console.log('你访问了', key)
 				return value
 			},
 			set: function reactiveSetter(newVal) {
 				if (newVal === value || (newVal !== newVal && value !== value)) {
 					return
 				}
-				if (this.watcher && this.watcher[key]) {
-					this.watcher[key].forEach((fn) => fn(newVal))
+				let k = this.__root__ || key
+				if (this.__watcher__ && this.__watcher__[k]) {
+					this.__watcher__[k].forEach((fn) => fn(newVal))
 				}
+				// console.log('你设置了', key, '=>', newVal)
 				value = newVal
 			}
 		})

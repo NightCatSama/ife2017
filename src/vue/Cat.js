@@ -14,10 +14,10 @@ export default class Cat {
 		this.$template = template
 		this.$el = el
 		this.$watcher = this.__initWatcher(watch)
-		this.__observer__ = new Observer(data, this.$watcher)
-		this.$data = this.__observer__
+		this.$data = new Observer(data, this.$watcher)
 		this.__render()
 	}
+	/*  初始化Watcher  */
 	__initWatcher(watch) {
 		let obj = {}
 		for (let key in watch) {
@@ -30,29 +30,18 @@ export default class Cat {
 		}
 		return obj
 	}
-	$watch(key, fn) {
-		if (this.$watcher[key]) {
-			this.$watcher[key].push(this.__bindContext(fn))
-		}
-		else {
-			this.$watcher[key] = [this.__bindContext(fn)]
-		}
-	}
-	__bindWatch(watch) {
-		for (let key in watch) {
-			watch[key] = this.__bindContext(watch[key])
-		}
-		return watch
-	}
+	/*  绑定方法的上下文指向this  */
 	__bindContext(fn) {
 		if (typeof fn !== 'function')
 			return
 		
 		return fn.bind(this)
 	}
+	/*  开始渲染  */
 	__render() {
 		this.$el.innerHTML = this.__parseTemplate()
 	}
+	/*  模板解析（未完成）  */
 	__parseTemplate() {
 		let data = this.$data
 		return this.$template.replace(RE, (...arg) => {
@@ -67,7 +56,17 @@ export default class Cat {
 				result = result[keyArr[i]]
 				i++
 			}
+			
 			return result
 		})
+	}
+	/*  添加watch  */
+	$watch(key, fn) {
+		if (this.$watcher[key]) {
+			this.$watcher[key].push(this.__bindContext(fn))
+		}
+		else {
+			this.$watcher[key] = [this.__bindContext(fn)]
+		}
 	}
 }
