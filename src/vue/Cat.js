@@ -16,6 +16,7 @@ export default class Cat {
 		this.$watcher = this.__initWatcher(watch)
 		this.$data = new Observer(data, this.$watcher)
 		this.__render()
+		this.$watcher.__render__ = this.__render.bind(this)
 	}
 	/*  初始化Watcher  */
 	__initWatcher(watch) {
@@ -39,25 +40,21 @@ export default class Cat {
 	}
 	/*  开始渲染  */
 	__render() {
-		this.$el.innerHTML = this.__parseTemplate()
+		let exp = `\`${this.__parseTemplate()}\``
+		let code = `
+		with (this.$data){
+			return eval(arguments[0])
+		}
+		return exp    
+		`
+		let html = new Function(code).call(this, exp)
+		this.$el.innerHTML = html
 	}
-	/*  模板解析（未完成）  */
+	/*  模板解析  */
 	__parseTemplate() {
 		let data = this.$data
 		return this.$template.replace(RE, (...arg) => {
-			let key = arg[1].trim().replace(/\[(\d+)\]/g, '.$1')
-			let keyArr = key.split('.')
-			if (keyArr.length === 1) {
-				return data[key]
-			}
-			let result = data
-			let i = 0
-			while (typeof result === 'object') {
-				result = result[keyArr[i]]
-				i++
-			}
-			
-			return result
+			return '${' + arg[1].trim() + '}'
 		})
 	}
 	/*  添加watch  */

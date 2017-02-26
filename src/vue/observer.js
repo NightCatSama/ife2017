@@ -72,6 +72,7 @@ export default class Observer {
 				}
 				// console.log('你设置了', key, '=>', newVal)
 				value = newVal
+				this.__watcher__.__render__()
 			}
 		})
 	}

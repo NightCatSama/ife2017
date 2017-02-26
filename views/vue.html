@@ -17,7 +17,7 @@
 <body>
 	<div id="app">
 		<h1>
-			Hello, {{ name.firstName }} {{ name.lastName }}
+			Hello, {{ name.firstName + name.lastName }}
 			<br />
 			<small>你点击了：{{ count }}次</small>
 		</h1>
@@ -77,8 +77,6 @@
 
 	function addCount () {
 		app.$data.count++
-		//  目前仍需要手动重载
-		app.__render()
 	}
 
 	</script>
