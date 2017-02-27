@@ -23,7 +23,6 @@
 		</h1>
 	</div>
 	<button onclick="addCount()">点击</button>
-	<script src="../dist/vue/dep.js"></script>
 	<script src="../dist/vue/observer.js"></script>
 	<script src="../dist/vue/cat.js"></script>
 	<script>
@@ -66,7 +65,7 @@
 			}
 		}
 	})
-	
+
 	app.$watch('count', function(v) {
 		console.log('之后监听的count变化：' + v)
 	})

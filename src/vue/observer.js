@@ -25,9 +25,6 @@ class ArrayProxy extends Array {
 	}
 }
 
-var set = {}
-var observeTarget = null
-
 /**
  * Observer
  */

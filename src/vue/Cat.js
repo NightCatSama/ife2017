@@ -1,4 +1,4 @@
-import Observer from './Observer.js'
+import Observer from './observer.js'
 
 /*  匹配双大括号内的内容  */
 const RE = /\{\{((?:.|\n)+?)\}\}/g
@@ -35,7 +35,7 @@ export default class Cat {
 	__bindContext(fn) {
 		if (typeof fn !== 'function')
 			return
-		
+
 		return fn.bind(this)
 	}
 	/*  开始渲染  */
@@ -45,7 +45,7 @@ export default class Cat {
 		with (this.$data){
 			return eval(arguments[0])
 		}
-		return exp    
+		return exp
 		`
 		let html = new Function(code).call(this, exp)
 		this.$el.innerHTML = html
