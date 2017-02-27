@@ -25,7 +25,7 @@ function setStyles(pos, center) {
 	let x = ~~((pos.px - center.cx) / (width / 2) * 8)
 	let y = ~~((pos.py - center.cy) / (height / 2) * 8)
 	let deg = -getAngle(pos, center)
-	let intensity = getDistance(pos, center) / diagonal / 2
+	let intensity = getDistance(pos, center) / diagonal
 	title.style.cssText = `
 		background-image: linear-gradient(${deg}deg, rgba(255, 255, 255, ${intensity}) 0%, rgba(255, 255, 255, 0) 80%);
 		background-image: -webkit-linear-gradient(${deg}deg, rgba(255, 255, 255, ${intensity / 2}) 0%, rgba(255, 255, 255, 0) 80%);
