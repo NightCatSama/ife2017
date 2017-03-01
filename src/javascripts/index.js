@@ -35,6 +35,11 @@ window.onload = () => {
 		img: 'http://ww1.sinaimg.cn/large/005Y4a20ly1fcr9i4yyamj30b40b474b',
 		href: 'views/vue.html',
 		topic_site: 'http://ife.baidu.com/course/detail/id/15'
+	}, {
+		name: '贪食蛇',
+		img: 'http://gss0.baidu.com/9rkZbzqaKgQUohGko9WTAnF6hhy/mms-res/fed/ife/ife_tutor/课程配图.3fb31f3e5af7e8d7.jpg',
+		href: 'views/Snake.html',
+		topic_site: 'http://ife.baidu.com/course/detail/id/15'
 	}]
 
 	loadList(products)
