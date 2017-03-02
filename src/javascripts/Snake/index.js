@@ -1,5 +1,6 @@
 'use strict'
 
+//  默认配置
 const _default = {
     bg_texture: '../dist/images/wood.png',
     snakeColor: '#2980b9',
@@ -9,22 +10,23 @@ const _default = {
     stopCb: null
 }
 
+//  初始化游戏数据
 const _init = {
-    rows: 20,
-    cols: 20,
-    size: 30,
-    barrier: [],
-    dir: 'right',
-    body: [0, 1, 2, 3, 4],
-    speed: 100
+    rows: 20, //  行数
+    cols: 20, //  列数
+    size: 30, //  每一块的大小
+    barrier: [],  //  障碍物数组
+    dir: 'right',  //  起始方向
+    body: [0, 1, 2, 3, 4],  // 起始蛇身
+    speed: 100   //  默认速度{毫秒}
 }
 
+//  关卡配置对象
 const _mode = {
     normal: {
         rows: 15,
         cols: 15,
         size: 25,
-        barrier: [],
         mode: {
             speedUp: {  //  多久后加速
                 time: 20000,  //  20秒加速一次
@@ -37,7 +39,6 @@ const _mode = {
         rows: 25,
         cols: 25,
         size: 30,
-        barrier: [],
         mode: {
             speedUp: null,
             eatApple: {
@@ -62,6 +63,7 @@ const _mode = {
     }
 }
 
+//  对立方向对象
 const dirMap = {
     left: 'right',
     right: 'left',
@@ -172,6 +174,8 @@ export default class Snake {
     //  游戏开始
     start(mode) {
         Object.assign(this, _init, _mode[mode])
+        this.dir = 'right'
+        this.barrier = []
         mode === 'elude' && this.createBarrier()
         this.startCb && this.startCb()
         this.gameRest()
@@ -326,6 +330,7 @@ export default class Snake {
     //  是不是出界了
     isFailed(index) {
         let { x, y } = this.getCoord(index)
+        //  靠左边且左转就gameover了，下面三个同理
         if (x === 0 && this.dir === 'left') {
             this.gameover()
             return true
@@ -343,7 +348,7 @@ export default class Snake {
             return true
         }
     }
-    //  两点确定方向
+    //  两点确定方向 【根据差值对照maps对象得到方向】
     getSelfDir(pos1, pos2) {
         let d = pos2 - pos1
         for (let dir in this.maps) {
@@ -381,20 +386,26 @@ export default class Snake {
             this.apple = null
             this.body.unshift(tail)  //  身体 + 1 尾部添加
             
+            //  根据游戏模式做出不同处理
             if (this.mode.eatApple) {
                 this.mode.eatApple.cur++
 
+                //  吃够了
                 if (this.mode.eatApple.cur === this.mode.eatApple.pass) {
                     this.mode.eatApple.cur = 0
+
+                    //  躲避模式
                     if (this.mode.eatApple.custom) {
                         this.custom++
                         this.gameover()
                         setTimeout(() =>　alert('你通关了，继续玩躲避模式进行下一关'))
                         return false
                     }
+                    //  通关模式
                     this.speed -= this.mode.eatApple.count
                 }
             }
+            //  吃完苹果延迟一秒加个苹果
             setTimeout(() => {
                 this.addApple()
             }, 1000)
