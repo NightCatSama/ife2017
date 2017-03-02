@@ -13,21 +13,57 @@
 	<meta name="full-screen" content="yes">
 	<meta name="x5-fullscreen" content="true">
 	<title>nightcat-mouseOverhang</title>
-    <style>
-        * {margin: 0;padding: 0;}
-        body {
-            width: 100vw;
-            height: 100vh;
-            overflow: hidden;
-        }
-    </style>
+	<link rel="stylesheet" href="../dist/stylesheets/nuomi/snake.min.css">
 </head>
 <body>
-    <canvas id="canvas"></canvas>
+    <div class="wrap">
+        <canvas id="canvas"></canvas>
+        <div class="control mask">
+            <button onClick="start('normal')">普通模式</button>
+            <button onClick="start('custom')">过关模式</button>
+            <button onClick="start('elude')">躲避模式</button>
+        </div>
+        <div class="pause mask hide">
+            <h1>暂停游戏</h1>
+            <small>按空格继续游戏</small>
+        </div>
+    </div>
+
     <script src="../dist/javascripts/Snake/index.js"></script>
     <script>
         var Snake = index.default
-        var game = new Snake('canvas')
+        var control = document.querySelector('.control')
+        var pause = document.querySelector('.pause')
+        var game = new Snake('canvas', {
+            startCb: () => {
+                toggleControl(false)
+            },
+            stopCb: () => {
+                toggleControl(true)
+            },
+            pauseBegin: () => {
+                togglePause(true)
+            },
+            pauseEnd: () => {
+                togglePause(false)
+            }
+        })
+
+        //  切换控制台
+        function toggleControl(show) {
+            game.isPlaying = !show
+            control.classList[show ? 'remove' : 'add']('hide')
+        }
+
+        //  切换暂时遮罩
+        function togglePause(show) {
+            pause.classList[show ? 'remove' : 'add']('hide')
+        }
+
+        //  游戏开始
+        function start(mode) {
+            game.start(mode)
+        }
     </script>
 </body>
 </html>
