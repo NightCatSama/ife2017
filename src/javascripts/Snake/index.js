@@ -2,12 +2,15 @@
 
 //  默认配置
 const _default = {
-    bg_texture: '../dist/images/wood.png',
-    snakeColor: '#2980b9',
-    barrierColor: '#333',
-    appleColor: '#d71345',
-    startCb: null,
-    stopCb: null
+    bg_texture: '../dist/images/wood.png',  // 背景纹理
+    snakeColor: '#2980b9',  //  蛇颜色
+    barrierColor: '#333',   //  障碍物颜色
+    appleColor: '#d71345',  //  果子颜色
+    cardinalNumber: 10,     //  躲避模式障碍物数量基数
+    startCb: null,          //  游戏开始回调
+    stopCb: null,           //  游戏结束回调
+    pauseBegin: null,       //  游戏暂停回调
+    pauseEnd: null          //  游戏继续回调
 }
 
 //  初始化游戏数据
@@ -18,7 +21,7 @@ const _init = {
     barrier: [],  //  障碍物数组
     dir: 'right',  //  起始方向
     body: [0, 1, 2, 3, 4],  // 起始蛇身
-    speed: 100   //  默认速度{毫秒}
+    speed: 100   //  默认起始速度{毫秒}
 }
 
 //  关卡配置对象
@@ -28,7 +31,7 @@ const _mode = {
         cols: 15,
         size: 25,
         mode: {
-            speedUp: {  //  多久后加速
+            speedUp: {        //  多久后加速
                 time: 20000,  //  20秒加速一次
                 count: 5      //  一次快5毫秒
             },
@@ -42,8 +45,8 @@ const _mode = {
         mode: {
             speedUp: null,
             eatApple: {
-                cur: 0,   //  当前吃了几个
-                pass: 5,  //  吃五个苹果加一级
+                cur: 0,    //  当前吃了几个
+                pass: 5,   //  吃五个苹果加一级
                 count: 5   //  一级快5毫秒
             }
         }
@@ -55,8 +58,8 @@ const _mode = {
         mode: {
             speedUp: null,
             eatApple: {
-                cur: 0,   //  当前吃了几个
-                pass: 5,  //  吃五个苹果进入下一关
+                cur: 0,       //  当前吃了几个
+                pass: 10,     //  吃十个苹果进入下一关
                 custom: true  //  关卡模式
             }
         }
@@ -72,27 +75,27 @@ const dirMap = {
 }
 
 export default class Snake {
-	constructor(id, option) {
-		Object.assign(this, _default, _init, option)
-		this.canvas = document.getElementById(id)
-		this.cxt = this.canvas.getContext('2d')
-		this.init()
-	}
+    constructor(id, option) {
+        Object.assign(this, _default, _init, option)
+        this.canvas = document.getElementById(id)
+        this.cxt = this.canvas.getContext('2d')
+        this.init()
+    }
     //  游戏初始化
-	init() {
-		this.isAnimate = false
-        this.isPlaying = false
-        this.custom = 1 //  当前关卡
-        this.events = []
+    init() {
+        this.isAnimate = false  //  是否游戏中
+        this.isPlaying = false  //  是否已经开始游戏（就算暂停也是true）
+        this.custom = 1     //  当前关卡，躲避模式用的
+        this.events = []    //  事件队列，避免玩家手速过快，蛇皮没移动就被下一个动作覆盖
         this.createStaticCanvas()
-		this.setSize()
+        this.setSize()
         this.getMaps()
         this.bindEvent()
         this.loadBgImg(() => {
             this.render()
             this.addApple()
         })
-	}
+    }
     //  生成一个静态的canvas【放背景，格子等的静态画布】
     createStaticCanvas() {
         this.static_canvas = document.createElement('canvas')
@@ -113,16 +116,16 @@ export default class Snake {
         parent.appendChild(this.static_canvas)
     }
     //  初始化尺寸
-	setSize() {
+    setSize() {
         this.width = this.cols * this.size
         this.height = this.rows * this.size
-		this.canvas.width = this.width
-		this.canvas.height = this.height
+        this.canvas.width = this.width
+        this.canvas.height = this.height
         this.static_canvas.width = this.width
         this.static_canvas.height = this.height
-	}
-    //  获得方向对应的数值
-    getMaps() {        
+    }
+    //  获得方向对应的数值 (我在你下面，那我的索引就比你多this.cols，在你右边那就是1)
+    getMaps() {
         this.maps = {
             top: -this.cols,
             bottom: this.cols,
@@ -130,18 +133,13 @@ export default class Snake {
             right: 1
         }
     }
-    //  一切都完了
-	destory() {
-		this.cxt.clearRect(0, 0, this.width, this.height)
-		this.stop()
-	}
     //  绑定事件
-	bindEvent() {
-		document.addEventListener('keydown', this.getKeyCode.bind(this))
-	}
+    bindEvent() {
+        document.addEventListener('keydown', this.getKeyCode.bind(this))
+    }
     //  获得键盘操作
     getKeyCode(e) {
-        switch(e.keyCode){
+        switch (e.keyCode) {
             case 87:
             case 38:
                 this.events.push(() => this.setDir('top'))
@@ -176,18 +174,19 @@ export default class Snake {
         Object.assign(this, _init, _mode[mode])
         this.dir = 'right'
         this.barrier = []
+        this.events = []
         mode === 'elude' && this.createBarrier()
         this.startCb && this.startCb()
         this.gameRest()
         this.gameTime = 0
         this.gameStart()
     }
-    //  生成障碍物
+    //  生成障碍物 （关卡决定数量）
     createBarrier() {
-        for(let i = 0; i < (this.custom * 10); i++) {
+        for (let i = 0; i < (this.custom * this.cardinalNumber); i++) {
             let barrier = this.body[0]
             //  随机到非第一行的地方
-            while(barrier <= this.cols) {
+            while (barrier <= this.cols) {
                 barrier = this.getRandom()
             }
             this.barrier.push(barrier)
@@ -203,10 +202,10 @@ export default class Snake {
         this.addApple()
     }
     //  开始渲染
-	gameStart() {
-		this.isAnimate = true
+    gameStart() {
+        this.isAnimate = true
 
-		const timer = () => {
+        const timer = () => {
             setTimeout(() => {
                 if (!this.isAnimate) {
                     return false
@@ -214,7 +213,7 @@ export default class Snake {
                 this.gameTime += this.speed
                 if (this.mode.speedUp && this.gameTime >= this.mode.speedUp.time) {
                     this.gameTime = 0
-                    this.speed -= this.mode.speedUp.count 
+                    this.speed -= this.mode.speedUp.count
                 }
                 this.cxt.clearRect(0, 0, this.width, this.height)
                 this.execQueue()
@@ -224,12 +223,12 @@ export default class Snake {
             }, this.speed)
         }
         timer()
-	}
+    }
     //  暂停游戏
-	stop() {
+    stop() {
         this.stopCb && this.stopCb()
-		this.isAnimate = false
-	}
+        this.isAnimate = false
+    }
     //  暂停/开始游戏
     switchGameStatus() {
         if (!this.isPlaying) {
@@ -257,43 +256,43 @@ export default class Snake {
     }
     //  加载背景
     loadBgImg(callback) {
-		this.image = new Image()
-		this.image.onload = () => {
+        this.image = new Image()
+        this.image.onload = () => {
             callback.apply(this)
-		}
-		this.image.src = this.bg_texture
+        }
+        this.image.src = this.bg_texture
     }
     //  画障碍物
     renderBarrier() {
-		this.static_cxt.fillStyle = this.barrierColor
-		Array.from(this.barrier, (pos, i) => {
+        this.static_cxt.fillStyle = this.barrierColor
+        Array.from(this.barrier, (pos, i) => {
             let { x, y } = this.getCoord(pos)
             this.static_cxt.fillRect(x * this.size, y * this.size, this.size, this.size)
-		})
+        })
     }
     //  画条蛇
-	renderSnake() {
-		this.cxt.fillStyle = this.snakeColor
-		Array.from(this.body, (pos, i) => {
+    renderSnake() {
+        this.cxt.fillStyle = this.snakeColor
+        Array.from(this.body, (pos, i) => {
             let { x, y } = this.getCoord(pos)
             this.cxt.fillRect(x * this.size, y * this.size, this.size, this.size)
-		})
-	}
-	//  画格子
-	renderGrid() {
-		this.static_cxt.strokeStyle = '#ccc'
-		this.static_cxt.lineWidth = 1
-		for (let x = 0; x < this.rows; x++) {
-			this.static_cxt.moveTo(x * this.size, 0)
-			this.static_cxt.lineTo(x * this.size, this.rows * this.size)
-			this.static_cxt.stroke()
-		}
-		for (let y = 0; y < this.cols; y++) {
-			this.static_cxt.moveTo(0, y * this.size)
-			this.static_cxt.lineTo(this.cols * this.size, y * this.size)
-			this.static_cxt.stroke()
-		}
-	}
+        })
+    }
+    //  画格子
+    renderGrid() {
+        this.static_cxt.strokeStyle = '#ccc'
+        this.static_cxt.lineWidth = 1
+        for (let x = 0; x < this.rows; x++) {
+            this.static_cxt.moveTo(x * this.size, 0)
+            this.static_cxt.lineTo(x * this.size, this.rows * this.size)
+            this.static_cxt.stroke()
+        }
+        for (let y = 0; y < this.cols; y++) {
+            this.static_cxt.moveTo(0, y * this.size)
+            this.static_cxt.lineTo(this.cols * this.size, y * this.size)
+            this.static_cxt.stroke()
+        }
+    }
     //  画背景
     renderBg() {
         this.static_cxt.fillStyle = this.static_cxt.createPattern(this.image, 'repeat')
@@ -315,9 +314,9 @@ export default class Snake {
     //  根据索引获得坐标
     getCoord(index) {
         return {
-			x: index % this.cols,
-			y: ~~(index / this.cols)
-		}
+            x: index % this.cols,
+            y: ~~(index / this.cols)
+        }
     }
     //  设置方向
     setDir(dir) {
@@ -358,7 +357,7 @@ export default class Snake {
         }
     }
     //  渲染更新
-	update() {
+    update() {
         let { body, barrier } = this
         //  头部
         let head = body[body.length - 1]
@@ -368,7 +367,7 @@ export default class Snake {
         let nextHead = head + this.maps[this.dir]
 
         //  头部要超出边界 或者 撞到自己 或者撞到障碍物
-        if(this.isFailed(head) || body.indexOf(nextHead) > -1 || barrier.indexOf(nextHead) > -1) {
+        if (this.isFailed(head) || body.indexOf(nextHead) > -1 || barrier.indexOf(nextHead) > -1) {
             return this.gameover()
         }
 
@@ -380,12 +379,12 @@ export default class Snake {
             else {
                 return pos + this.maps[this.getSelfDir(pos, body[i + 1])]
             }
-		})
+        })
         //  是不是吃到苹果呀
         if (nextHead === this.apple) {
             this.apple = null
             this.body.unshift(tail)  //  身体 + 1 尾部添加
-            
+
             //  根据游戏模式做出不同处理
             if (this.mode.eatApple) {
                 this.mode.eatApple.cur++
@@ -398,7 +397,7 @@ export default class Snake {
                     if (this.mode.eatApple.custom) {
                         this.custom++
                         this.gameover()
-                        setTimeout(() =>　alert('你通关了，继续玩躲避模式进行下一关'))
+                        setTimeout(() => alert('你通关了，继续玩躲避模式进行下一关'))
                         return false
                     }
                     //  通关模式
@@ -410,7 +409,7 @@ export default class Snake {
                 this.addApple()
             }, 1000)
         }
-	}
+    }
     //  随机一个数字
     getRandom() {
         return ~~(Math.random() * this.cols * this.rows)
@@ -419,7 +418,7 @@ export default class Snake {
     addApple() {
         let apple = this.body[0]
         //  随机到非身体or障碍物位置的地方添加个果子
-        while(this.body.indexOf(apple) > -1 || this.barrier.indexOf(apple) > -1) {
+        while (this.body.indexOf(apple) > -1 || this.barrier.indexOf(apple) > -1) {
             apple = this.getRandom()
         }
         this.apple = apple
