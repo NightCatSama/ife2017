@@ -6,6 +6,7 @@ const _default = {
     snakeColor: '#2980b9',  //  蛇颜色
     barrierColor: '#333',   //  障碍物颜色
     appleColor: '#d71345',  //  果子颜色
+    appleScore: 100,        //  果子分数
     cardinalNumber: 10,     //  躲避模式障碍物数量基数
     startCb: null,          //  游戏开始回调
     stopCb: null,           //  游戏结束回调
@@ -39,9 +40,9 @@ const _mode = {
         }
     },
     custom: {
-        rows: 30,
-        cols: 30,
-        size: 20,
+        rows: 20,
+        cols: 20,
+        size: 30,
         mode: {
             speedUp: null,
             eatApple: {
@@ -52,9 +53,9 @@ const _mode = {
         }
     },
     elude: {
-        rows: 25,
-        cols: 25,
-        size: 24,
+        rows: 20,
+        cols: 20,
+        size: 30,
         mode: {
             speedUp: null,
             eatApple: {
@@ -78,6 +79,7 @@ export default class Snake {
     constructor(id, option) {
         Object.assign(this, _default, _init, option)
         this.canvas = document.getElementById(id)
+        this.parent = this.canvas.parentElement
         this.cxt = this.canvas.getContext('2d')
         this.init()
     }
@@ -85,7 +87,8 @@ export default class Snake {
     init() {
         this.isAnimate = false  //  是否游戏中
         this.isPlaying = false  //  是否已经开始游戏（就算暂停也是true）
-        this.custom = 1     //  当前关卡，躲避模式用的
+        this.custom = 1     //  当前关卡，躲避模式用的 
+        this.score = 0      //  得分
         this.events = []    //  事件队列，避免玩家手速过快，蛇皮没移动就被下一个动作覆盖
         this.createStaticCanvas()
         this.createStat()
@@ -98,7 +101,6 @@ export default class Snake {
     createStaticCanvas() {
         this.static_canvas = document.createElement('canvas')
         this.static_cxt = this.static_canvas.getContext('2d')
-
         this.canvas.style.cssText = `
             position: relative;
             z-index: 1;
@@ -108,39 +110,40 @@ export default class Snake {
             left: 0;
             top: 0;
         `
-
-        let parent = this.canvas.parentElement
-        parent.style.position = 'relative'
-        parent.appendChild(this.static_canvas)
+        this.parent.style.position = 'relative'
+        this.parent.appendChild(this.static_canvas)
     }
     //  生成右上角数据展示 （监听速度，长度等）
     createStat() {
         this.stat = document.createElement('DIV')
+        this.speedBlock = document.createElement('DIV')
+        this.scoreBlock = document.createElement('DIV')
         this.stat.style.cssText = `
             position: absolute;
             right: 0;
-            top: -20px;
+            bottom: 100%;
             font-size: 16px;
         `
-        this.observer('speed', (val) => this.stat.textContent = `速度：${val}`)
-        let parent = this.canvas.parentElement
-        parent.appendChild(this.stat)
+        this.observer('speed', (val) => this.speedBlock.textContent = `速度：${val}ms/格`)
+        this.observer('score', (val) => this.scoreBlock.textContent = `得分：${val}`)
+        this.stat.appendChild(this.speedBlock)
+        this.stat.appendChild(this.scoreBlock)
+        this.parent.appendChild(this.stat)
     }
     //  监听数据变化
     observer(key, cb) {
         let val = this[key]
-        console.log(val)
-		Object.defineProperty(this, key, {
-			get: () => {
-				return val
-			},
-			set: (newValue) => {
-				cb(newValue)
-				val = newValue
-			},
-			enumerable: true,
-			configurable: true
-		})
+        Object.defineProperty(this, key, {
+            get: () => {
+                return val
+            },
+            set: (newValue) => {
+                cb(newValue)
+                val = newValue
+            },
+            enumerable: true,
+            configurable: true
+        })
     }
     //  初始化尺寸
     setSize() {
@@ -203,6 +206,7 @@ export default class Snake {
         this.barrier = []
         this.events = []
         mode === 'elude' && this.createBarrier()
+        this.score = mode === 'elude' ? ((this.custom - 1) * this.mode.eatApple.pass * this.appleScore) : 0
         this.startCb && this.startCb()
         this.gameRest()
         this.gameTime = 0
@@ -316,7 +320,7 @@ export default class Snake {
     renderBg() {
         for (let x = 0; x < this.rows; x++) {
             for (let y = 0; y < this.cols; y++) {
-                this.static_cxt.fillStyle = (x + y)%2 === 0 ? this.bgColor[0] : this.bgColor[1]
+                this.static_cxt.fillStyle = (x + y) % 2 === 0 ? this.bgColor[0] : this.bgColor[1]
                 this.static_cxt.fillRect(x * this.size, y * this.size, this.width, this.height)
             }
         }
@@ -332,6 +336,10 @@ export default class Snake {
             this.cxt.closePath()
 
             this.cxt.fill()
+        }
+        else {
+            this.addApple()
+            this.renderApple()
         }
     }
     //  根据索引获得坐标
@@ -395,18 +403,13 @@ export default class Snake {
         }
 
         //  除了头部的其他 身体块 按 紧接着的下一块身体块 移动
-        this.body = Array.from(this.body, (pos, i) => {
-            if (i === body.length - 1) {
-                return nextHead
-            }
-            else {
-                return pos + this.maps[this.getSelfDir(pos, body[i + 1])]
-            }
-        })
+        this.body = Array.from(this.body, (pos, i) => i === body.length - 1 ? nextHead : (pos + this.maps[this.getSelfDir(pos, body[i + 1])]))
+
         //  是不是吃到苹果呀
         if (nextHead === this.apple) {
             this.apple = null
-            this.body.unshift(tail)  //  身体 + 1 尾部添加
+            this.score += this.appleScore //  分数叠加
+            this.body.unshift(tail)       //  身体 + 1 尾部添加
 
             //  根据游戏模式做出不同处理
             if (this.mode.eatApple) {
@@ -427,8 +430,6 @@ export default class Snake {
                     this.speed -= this.mode.eatApple.count
                 }
             }
-            //  吃完苹果加个苹果
-            this.addApple()
         }
     }
     //  随机一个数字
@@ -437,7 +438,7 @@ export default class Snake {
     }
     //  加个果子
     addApple() {
-        let apple = this.body[0]
+        let apple = this.getRandom()
         //  随机到非身体or障碍物位置的地方添加个果子
         while (this.body.indexOf(apple) > -1 || this.barrier.indexOf(apple) > -1) {
             apple = this.getRandom()
