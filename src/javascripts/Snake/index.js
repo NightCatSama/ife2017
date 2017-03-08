@@ -2,7 +2,7 @@
 
 //  默认配置
 const _default = {
-    bg_texture: '../dist/images/wood.png',  // 背景纹理
+    bgColor: ['#f3f3f3', '#dfdfdf'],
     snakeColor: '#2980b9',  //  蛇颜色
     barrierColor: '#333',   //  障碍物颜色
     appleColor: '#d71345',  //  果子颜色
@@ -21,15 +21,15 @@ const _init = {
     barrier: [],  //  障碍物数组
     dir: 'right',  //  起始方向
     body: [0, 1, 2, 3, 4],  // 起始蛇身
-    speed: 100   //  默认起始速度{毫秒}
+    speed: 150   //  默认起始速度{毫秒}
 }
 
 //  关卡配置对象
 const _mode = {
     normal: {
-        rows: 15,
-        cols: 15,
-        size: 25,
+        rows: 20,
+        cols: 20,
+        size: 30,
         mode: {
             speedUp: {        //  多久后加速
                 time: 20000,  //  20秒加速一次
@@ -39,9 +39,9 @@ const _mode = {
         }
     },
     custom: {
-        rows: 25,
-        cols: 25,
-        size: 30,
+        rows: 30,
+        cols: 30,
+        size: 20,
         mode: {
             speedUp: null,
             eatApple: {
@@ -54,7 +54,7 @@ const _mode = {
     elude: {
         rows: 25,
         cols: 25,
-        size: 30,
+        size: 24,
         mode: {
             speedUp: null,
             eatApple: {
@@ -88,13 +88,11 @@ export default class Snake {
         this.custom = 1     //  当前关卡，躲避模式用的
         this.events = []    //  事件队列，避免玩家手速过快，蛇皮没移动就被下一个动作覆盖
         this.createStaticCanvas()
+        this.createStat()
         this.setSize()
         this.getMaps()
         this.bindEvent()
-        this.loadBgImg(() => {
-            this.render()
-            this.addApple()
-        })
+        this.render()
     }
     //  生成一个静态的canvas【放背景，格子等的静态画布】
     createStaticCanvas() {
@@ -114,6 +112,35 @@ export default class Snake {
         let parent = this.canvas.parentElement
         parent.style.position = 'relative'
         parent.appendChild(this.static_canvas)
+    }
+    //  生成右上角数据展示 （监听速度，长度等）
+    createStat() {
+        this.stat = document.createElement('DIV')
+        this.stat.style.cssText = `
+            position: absolute;
+            right: 0;
+            top: -20px;
+            font-size: 16px;
+        `
+        this.observer('speed', (val) => this.stat.textContent = `速度：${val}`)
+        let parent = this.canvas.parentElement
+        parent.appendChild(this.stat)
+    }
+    //  监听数据变化
+    observer(key, cb) {
+        let val = this[key]
+        console.log(val)
+		Object.defineProperty(this, key, {
+			get: () => {
+				return val
+			},
+			set: (newValue) => {
+				cb(newValue)
+				val = newValue
+			},
+			enumerable: true,
+			configurable: true
+		})
     }
     //  初始化尺寸
     setSize() {
@@ -254,14 +281,6 @@ export default class Snake {
         this.renderSnake()
         this.renderApple()
     }
-    //  加载背景
-    loadBgImg(callback) {
-        this.image = new Image()
-        this.image.onload = () => {
-            callback.apply(this)
-        }
-        this.image.src = this.bg_texture
-    }
     //  画障碍物
     renderBarrier() {
         this.static_cxt.fillStyle = this.barrierColor
@@ -295,8 +314,12 @@ export default class Snake {
     }
     //  画背景
     renderBg() {
-        this.static_cxt.fillStyle = this.static_cxt.createPattern(this.image, 'repeat')
-        this.static_cxt.fillRect(0, 0, this.width, this.height)
+        for (let x = 0; x < this.rows; x++) {
+            for (let y = 0; y < this.cols; y++) {
+                this.static_cxt.fillStyle = (x + y)%2 === 0 ? this.bgColor[0] : this.bgColor[1]
+                this.static_cxt.fillRect(x * this.size, y * this.size, this.width, this.height)
+            }
+        }
     }
     //  画个苹果
     renderApple() {
@@ -404,10 +427,8 @@ export default class Snake {
                     this.speed -= this.mode.eatApple.count
                 }
             }
-            //  吃完苹果延迟一秒加个苹果
-            setTimeout(() => {
-                this.addApple()
-            }, 1000)
+            //  吃完苹果加个苹果
+            this.addApple()
         }
     }
     //  随机一个数字
