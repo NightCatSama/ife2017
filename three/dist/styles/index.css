@@ -1,0 +1,99 @@
+@charset 'UTF-8';
+/*
+ * Beautiful Color
+ */
+/*
+ * 垂直居中
+ */
+/*
+ * 设置placeholder样式
+ */
+/*
+ * flex 居中
+ */
+*
+{
+    box-sizing: border-box;
+}
+
+body,
+div,
+dl,
+dt,
+dd,
+ul,
+ol,
+li,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+pre,
+code,
+form,
+fieldset,
+legend,
+input,
+button,
+textarea,
+p,
+blockquote,
+th,
+td
+{
+    margin: 0;
+    padding: 0;
+}
+
+a,
+a:hover,
+a:active,
+a:focus,
+input,
+input:hover,
+input:active,
+input:focus
+{
+    outline: none;
+}
+
+ul,
+ol
+{
+    list-style: none;
+}
+
+html
+{
+    font-family: 'Segoe UI', Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
+}
+
+body
+{
+    display: -webkit-box;
+    display: flex;
+
+    width: 100vw;
+    height: 100vh;
+
+    background-color: #3498db;
+
+    -webkit-box-pack: center;
+    justify-content: center;
+    -webkit-box-align: center;
+    align-items: center;
+}
+
+h1
+{
+    font-size: 50px;
+}
+
+a
+{
+    text-decoration: none;
+
+    color: #fff;
+}
