@@ -5,18 +5,30 @@ body {
 	display: flex;
 	flex-wrap: wrap;
 	width: 100%;
+
+	@include max-screen(768px) {
+		justify-content: center;
+	}
 }
 
 .card {
 	display: flex;
-	width: 25%;
-	height: 280px;
+	width: calc(33% - 40px);
+	height: 300px;
 	flex-direction: column;
 	align-items: center;
 	padding: 30px;
 	margin: 20px;
 	color: $light-black;
 	box-shadow: 0 0 3px 2px rgba(0, 0, 0, .36);
+
+	@include max-screen(1200px) {
+		width: calc(50% - 40px);
+	}
+
+	@include max-screen(768px) {
+		width: 95%;
+	}
 
 	.img {
 		width: 100%;

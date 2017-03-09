@@ -54,3 +54,9 @@ $colors: ($red: #E74C3C, $blue: #3498DB, $yellow: #F1C40F, $green: #2ECC71, $ora
     justify-content: center;
     align-items: center;
 }
+
+@mixin max-screen($res) {
+    @media ( max-width: $res) {
+        @content;
+    }
+}

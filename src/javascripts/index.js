@@ -40,6 +40,11 @@ window.onload = () => {
 		img: 'http://gss0.baidu.com/9rkZbzqaKgQUohGko9WTAnF6hhy/mms-res/fed/ife/ife_tutor/课程配图.3fb31f3e5af7e8d7.jpg',
 		href: 'views/Snake.html',
 		topic_site: 'http://ife.baidu.com/course/detail/id/15'
+	}, {
+		name: 'WebGL - Three.js',
+		img: 'http://gss0.baidu.com/9rkZbzqaKgQUohGko9WTAnF6hhy/mms-res/fed/ife/ife_tutor/课程配图.3fb31f3e5af7e8d7.jpg',
+		href: 'three/',
+		topic_site: 'http://ife.baidu.com/course/detail/id/18'
 	}]
 
 	loadList(products)
