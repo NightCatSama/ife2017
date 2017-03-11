@@ -101,7 +101,7 @@ export const createBox = function () {
 //  生成圆环
 export const createTorus = function () {
 	var geometry = new THREE.TorusGeometry(this.wheel_size.radius - 6, 6, this.wheel_size.segments, 50)
-	var texture = new THREE.TextureLoader().load('/asset/image/wheel.png')
+	var texture = new THREE.TextureLoader().load('../../asset/image/wheel.png')
 	texture.wrapS = texture.wrapT = THREE.RepeatWrapping
 	texture.repeat.set(20, 1)
 	var material = new THREE.MeshPhongMaterial({
@@ -118,7 +118,7 @@ export const createTorus = function () {
 export const createPlane = function () {
 	var { width, height, segments } = this.plane_size
 	var geometry = new THREE.PlaneGeometry(width, height, segments, segments)
-	var texture = new THREE.TextureLoader().load('/asset/image/wood.png')
+	var texture = new THREE.TextureLoader().load('../../asset/image/wood.png')
 	texture.wrapS = texture.wrapT = THREE.RepeatWrapping
 	texture.repeat.set(20, 20)
 	var material = new THREE.MeshPhongMaterial({
